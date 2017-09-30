@@ -1,7 +1,6 @@
 <template>
   <div class="prediction">
-    <h2 v-if="loading" class="grey--text">thinking..</h2>
-    <h2 v-else class="white--text" v-html="prediction"></h2>
+    <v-parallax jumbotron :height="height" :src="prediction.image"><h2>{{ prediction.answer }}</h2></v-parallax>
   </div>
 </template>
 
@@ -13,7 +12,7 @@ export default {
   data () {
     return {
       loading: true,
-      prediction: null,
+      unused: null,
       errors: []
     }
   },
@@ -36,17 +35,23 @@ export default {
       }
       axios.get(`http://thought.center:8081/nethub/jared/cryptopticon`)
         .then(response => {
-          this.prediction = 'A: ' +
+          this.unused = 'A: ' +
             ((response.data.lastPrediction === 1)
               ? phrases.happy[Math.floor(Math.random() * phrases.happy.length)]
-              : phrases.sad[Math.floor(Math.random() * phrases.sad.length))]
-          this.loading = false
+              : phrases.sad[Math.floor(Math.random() * phrases.sad.length)])
         })
         .catch(e => {
           this.errors.push(e)
-          this.prediction = 'A: Idk. Something went wrong?'
-          this.loading = false
+          this.unused = 'A: Idk. Something went wrong?'
         })
+    }
+  },
+  computed: {
+    prediction () {
+      return this.$store.state.prediction
+    },
+    height () {
+      return window.innerHeight
     }
   }
 }

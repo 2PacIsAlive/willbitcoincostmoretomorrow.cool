@@ -1,28 +1,64 @@
 <template>
   <div id="app">
     <v-app>
-      <main>
-        <v-parallax height=800 src="/static/bitcoin.jpg">
-          <h1 class="white--text">Q: Will <a style="color: #fff;" href="https://bitcoin.org">Bitcoin</a> cost more tomorrow?</h1>
+        <div v-if="loading">
+          <v-progress-linear v-bind:indeterminate="true"></v-progress-linear>
+          one sec..
+        </div>
+        <div v-else>
           <router-view></router-view>
-        </v-parallax>
-        <v-container>
-          <h4 class="text-md-left">How it works:</h4>
-          <h5 class="text-md-left">Using a <a href="http://thought.center:8081/nethub/jared/cryptopticon">neural network</a> of course!</h5>
-        </v-container>
-        <v-parallax height=800 src="/static/bitcoin-chart.jpg">
-          <h2 class="white--text text-md-right">Q: Should I use this as investing advice?</h2>
-          <h3 class="white--text text-md-right">A: Absolutely not, none of the content published on this webpage constitutes a recommendation that any transaction or investment strategy is suitable for any person.</h3>
-          <h4 class="white--text text-md-right">Check out <a style="color: #fff;" href="http://thought.center:8081/nethub">nethub</a> to build and deploy your own neural network.</h4>
-        </v-parallax>
-      </main>
+        </div>
+        <v-footer>
+          <div v-html="disclaimer"></div>
+        </v-footer>
     </v-app>
   </div>
 </template>
 
 <script>
+import axios from 'axios'
+import { mapState } from 'vuex'
+
 export default {
-  name: 'app'
+  name: 'app',
+  data () {
+    return {
+      disclaimer: 'Disclaimer: This website does not provide investing advice, and should not be used in such a manner. Build your own neural network using <a href="http://thought.center/nethub">nethub</a> why don\'tcha',
+      errors: [],
+      image: null
+    }
+  },
+  methods: {
+    loadImage: function () {
+      axios.get(`https://yesno.wtf/api?force=yes`) // todo: force based on prediction
+        .then(response => {
+          this.image = response.data.image
+          this.loading = false
+        })
+        .catch(e => {
+          this.errors.push(e)
+          axios.get(`https://yesno.wtf/api?force=maybe`)
+            .then(response => {
+              this.image = response.data.image
+              this.loading = false
+            })
+            .catch(e => {
+              this.errors.push(e)
+            })
+        })
+    }
+  },
+  mounted () {
+    this.$store.dispatch('getPrediction').then(() => {
+      this.$store.dispatch('getImage', this.answer).then(() => {
+        this.$store.commit('setLoading', false)
+      })
+    })
+  },
+  computed: mapState({
+    answer: state => state.answer,
+    loading: state => state.loading
+  })
 }
 </script>
 
