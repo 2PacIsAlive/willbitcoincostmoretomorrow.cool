@@ -1,51 +1,39 @@
 <template>
   <div id="app">
-    <v-app>
-        <div v-if="loading">
-          <v-progress-linear v-bind:indeterminate="true"></v-progress-linear>
-          one sec..
-        </div>
-        <div v-else>
-          <router-view></router-view>
-        </div>
-        <v-footer>
+    <v-app light>
+      <div v-if="loading">
+        <v-progress-linear v-bind:indeterminate="true"></v-progress-linear>
+        one sec..
+      </div>
+      <div v-else>
+        <router-view></router-view>
+        <v-footer class="l">
+          <div>Hacked up by <a href=https://github.com/2PacIsAlive>Jared Jolton</a>.</div>
+        </v-footer>
+        <v-footer dark class="l">
+          <div>Contact: jared@willbitcoincostmoretomorrow.cool</div>
+        </v-footer>
+        <v-footer class="l">
+          <v-spacer></v-spacer>
           <div v-html="disclaimer"></div>
         </v-footer>
+        <v-footer dark class="l">
+          <v-spacer></v-spacer>
+          <div>Use <a href="http://thought.center/nethub">nethub</a> to build your own bitcoin-price predicting neural network why don'tcha, it's easy <i>and</i> fun!</div>
+        </v-footer>
+      </div>
     </v-app>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
 import { mapState } from 'vuex'
 
 export default {
   name: 'app',
   data () {
     return {
-      disclaimer: 'Disclaimer: This website does not provide investing advice, and should not be used in such a manner. Build your own neural network using <a href="http://thought.center/nethub">nethub</a> why don\'tcha',
-      errors: [],
-      image: null
-    }
-  },
-  methods: {
-    loadImage: function () {
-      axios.get(`https://yesno.wtf/api?force=yes`) // todo: force based on prediction
-        .then(response => {
-          this.image = response.data.image
-          this.loading = false
-        })
-        .catch(e => {
-          this.errors.push(e)
-          axios.get(`https://yesno.wtf/api?force=maybe`)
-            .then(response => {
-              this.image = response.data.image
-              this.loading = false
-            })
-            .catch(e => {
-              this.errors.push(e)
-            })
-        })
+      disclaimer: 'Disclaimer: This website does not provide investment or trading advice.'
     }
   },
   mounted () {
