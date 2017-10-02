@@ -43,7 +43,7 @@ export default new Vuex.Store({
         if (latestData) {
           axios.post(`/nethub/jared/cryptopticon/predict`, latestData)
             .then(response => {
-              commit('setAnswer', (response.data === 0) ? 'no' : 'yes')
+              commit('setAnswer', (response.data[0] > response.data[1]) ? 'no' : 'yes')
               resolve()
             })
             .catch(e => {
