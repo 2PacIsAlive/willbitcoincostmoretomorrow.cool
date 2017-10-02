@@ -8,10 +8,10 @@
       <div v-else>
         <router-view></router-view>
         <v-footer class="l">
-          <div>Hacked up by <a href=https://github.com/2PacIsAlive>Jared Jolton</a>.</div>
+          <div>Hacked up by <a href=https://github.com/2PacIsAlive>Jared Jolton</a>. Contact: jared@willbitcoincostmoretomorrow.cool</div>
         </v-footer>
         <v-footer dark class="l">
-          <div>Contact: jared@willbitcoincostmoretomorrow.cool Donate: <a href="bitcoin:1GmT5px2b5hJTH2Lssb56v3NBUbvu9YJXc">1GmT5px2b5hJTH2Lssb56v3NBUbvu9YJXc</a></div>
+          <div>Donate: <a href="bitcoin:1GmT5px2b5hJTH2Lssb56v3NBUbvu9YJXc">1GmT5px2b5hJTH2Lssb56v3NBUbvu9YJXc</a></div>
         </v-footer>
         <v-footer class="l">
           <v-spacer></v-spacer>
@@ -37,13 +37,16 @@ export default {
     }
   },
   mounted () {
-    this.$store.dispatch('getPrediction').then(() => {
-      this.$store.dispatch('getImage', this.answer).then(() => {
-        this.$store.commit('setLoading', false)
+    this.$store.dispatch('getLatestData').then(() => {
+      this.$store.dispatch('getPrediction', this.latestData).then(() => {
+        this.$store.dispatch('getImage', this.answer).then(() => {
+          this.$store.commit('setLoading', false)
+        })
       })
     })
   },
   computed: mapState({
+    latestData: state => state.latestData,
     answer: state => state.answer,
     loading: state => state.loading
   })

@@ -6,11 +6,15 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    latestData: null,
     prediction: {},
     answer: 'maybe',
     loading: true
   },
   mutations: {
+    setLatestData (state, latestData) {
+      state.latestData = latestData
+    },
     setAnswer (state, answer) {
       state.answer = answer
     },
@@ -22,16 +26,31 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    getPrediction ({ commit }) {
+    getLatestData ({ commit }) {
       return new Promise((resolve, reject) => {
-        axios.get(`http://thought.center:8081/nethub/jared/cryptopticon`)
+        axios.get(`https://www.quandl.com/api/v3/datasets/BCHARTS/COINBASEUSD?limit=1`)
           .then(response => {
-            commit('setAnswer', (response.data === 0) ? 'no' : 'yes')
+            commit('setLatestData', (response.data.dataset.data[0].slice(1)))
             resolve()
           })
           .catch(e => {
             resolve()
           })
+      })
+    },
+    getPrediction ({ commit }, latestData) {
+      return new Promise((resolve, reject) => {
+        if (latestData) {
+          axios.post(`/nethub/jared/cryptopticon/predict`, latestData)
+            .then(response => {
+              commit('setAnswer', (response.data === 0) ? 'no' : 'yes')
+              resolve()
+            })
+            .catch(e => {
+              resolve()
+            })
+        }
+        resolve()
       })
     },
     getImage ({ commit }, answer) {
