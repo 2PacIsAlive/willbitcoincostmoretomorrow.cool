@@ -11,7 +11,7 @@
           <div>Hacked up by <a href=https://github.com/2PacIsAlive>Jared Jolton</a>.</div>
         </v-footer>
         <v-footer dark class="l">
-          <div>Contact: jared@willbitcoincostmoretomorrow.cool Donate: { my btc addr }</div>
+          <div>Contact: jared@willbitcoincostmoretomorrow.cool Donate: <a href="bitcoin:1GmT5px2b5hJTH2Lssb56v3NBUbvu9YJXc">1GmT5px2b5hJTH2Lssb56v3NBUbvu9YJXc</a></div>
         </v-footer>
         <v-footer class="l">
           <v-spacer></v-spacer>
