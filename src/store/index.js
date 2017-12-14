@@ -28,12 +28,16 @@ export default new Vuex.Store({
   actions: {
     getLatestData ({ commit }) {
       return new Promise((resolve, reject) => {
-        axios.get(`https://www.quandl.com/api/v3/datasets/BCHARTS/COINBASEUSD?limit=1`)
+        axios({
+          method: 'get',
+          url: `https://www.quandl.com/api/v3/datasets/BCHARTS/COINBASEUSD.json?limit=1`
+        })
           .then(response => {
-            commit('setLatestData', (response.data.dataset.data[0].slice(1)))
-            resolve()
+            console.log(response)
+            resolve(response.data.dataset.data[0].slice(1))
           })
           .catch(e => {
+            console.log(e)
             resolve()
           })
       })
@@ -41,22 +45,70 @@ export default new Vuex.Store({
     getPrediction ({ commit }, latestData) {
       return new Promise((resolve, reject) => {
         if (latestData) {
-          axios.post(`/nethub/jared/cryptopticon/predict`, latestData)
+          axios.post(`/nethub/jared/cryptopticon/predict`, {
+            name: 'cryptopticon',
+            layers: [
+              {
+                type: 'input',
+                shape: [null, 7]
+              }, {
+                type: 'fully_connected',
+                num_units: 64,
+                activation: 'linear'
+              }, {
+                type: 'dropout',
+                keep_prob: 0.8
+              }, {
+                type: 'fully_connected',
+                num_units: 64,
+                activation: 'linear'
+              }, {
+                type: 'dropout',
+                keep_prob: 0.8
+              }, {
+                type: 'fully_connected',
+                num_units: 64,
+                activation: 'linear'
+              }, {
+                type: 'fully_connected',
+                num_units: 2,
+                activation: 'softmax'
+              }, {
+                type: 'regression',
+                optimizer: 'sgd',
+                loss_fcn: 'categorical_crossentropy',
+                learning_rate: 0.001
+              }
+            ],
+            data: latestData
+          })
             .then(response => {
-              commit('setAnswer', (response.data[0] > response.data[1]) ? 'no' : 'yes')
-              resolve()
+              if (response.status === 200) {
+                if (response.data[0] > response.data[1]) {
+                  commit('setAnswer', 'no')
+                  resolve({'answer': 'no', 'confidence': (response.data[0] * 100)})
+                } else {
+                  commit('setAnswer', 'yes')
+                  resolve({'answer': 'yes', 'confidence': (response.data[1] * 100)})
+                }
+              } else {
+                resolve({'answer': 'maybe', 'confidence': 100})
+              }
             })
             .catch(e => {
-              resolve()
+              console.log(e)
+              resolve({'answer': 'maybe', 'confidence': 100})
             })
+        } else {
+          resolve({'answer': 'maybe', 'confidence': 100})
         }
-        resolve()
       })
     },
-    getImage ({ commit }, answer) {
+    getImage ({ commit }, prediction) {
       return new Promise((resolve, reject) => {
-        axios.get(`https://yesno.wtf/api?force=${answer}`)
+        axios.get(`https://yesno.wtf/api?force=${prediction.answer}`)
           .then(response => {
+            response.data.confidence = prediction.confidence.toFixed(2)
             commit('setPrediction', response.data)
             resolve()
           })

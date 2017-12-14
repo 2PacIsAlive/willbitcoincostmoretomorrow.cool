@@ -1,7 +1,7 @@
 <template>
   <div class="prediction">
     <v-parallax jumbotron :height="height" :src="prediction.image">
-      <h2>{{ prediction.answer }}</h2>
+      <h2>{{ prediction.answer }} (I'm {{ prediction.confidence }}% sure)</h2>
     </v-parallax>
   </div>
 </template>

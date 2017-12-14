@@ -3,7 +3,7 @@
     <v-app light>
       <div v-if="loading">
         <v-progress-linear v-bind:indeterminate="true"></v-progress-linear>
-        one sec..
+        thinking..
       </div>
       <div v-else>
         <router-view></router-view>
@@ -19,7 +19,7 @@
         </v-footer>
         <v-footer dark class="l">
           <v-spacer></v-spacer>
-          <div>Use <a href="http://thought.center/nethub">nethub</a> to build your own bitcoin-price predicting neural network why don'tcha, it's easy <i>and</i> fun!</div>
+          <div>Coming soon: Use <a href="http://github.com/2PacIsAlive/nethub">nethub</a> to build your own bitcoin-price predicting neural networks!</div>
         </v-footer>
       </div>
     </v-app>
@@ -37,16 +37,16 @@ export default {
     }
   },
   mounted () {
-    this.$store.dispatch('getLatestData').then(() => {
-      this.$store.dispatch('getPrediction', this.latestData).then(() => {
-        this.$store.dispatch('getImage', this.answer).then(() => {
-          this.$store.commit('setLoading', false)
+    let app = this
+    app.$store.dispatch('getLatestData').then(function (latestData) {
+      app.$store.dispatch('getPrediction', latestData).then(function (prediction) {
+        app.$store.dispatch('getImage', prediction).then(() => {
+          app.$store.commit('setLoading', false)
         })
       })
     })
   },
   computed: mapState({
-    latestData: state => state.latestData,
     answer: state => state.answer,
     loading: state => state.loading
   })
